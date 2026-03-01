@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建造者法则 | 核心体系</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 基础色调 */
+            --bg-primary: #050A14;
+            --bg-card: #0F1724;
+            --bg-card-hover: #151F30;
+            --text-main: #F0F4F8;
+            --text-sub: #94A3B8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --gold-main: #D4A017;
+            --gold-glow: rgba(212, 160, 23, 0.2);
+            
+            /* 图标专属配色系统 */
+            --color-body: #D4A017;      /* 金色：力量、价值 */
+            --color-focus: #00FFFF;     /* 青色：冷静、科技 */
+            --color-relation: #2C9E5E;  /* 绿色：生长、连接 */
+            --color-library: #9333EA;   /* 紫晶色：精准、规范、专业 */
+            --color-thinking: #E63946;  /* 赤红/玫瑰红：智慧、策略、突破 */
+
+            /* 通用阴影 */
+            --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.4);
+            /* 3D立体阴影变量 */
+            --shadow-3d-body: 0 8px 20px rgba(212, 160, 23, 0.15), 0 0 30px rgba(212, 160, 23, 0.05);
+            --shadow-3d-focus: 0 8px 20px rgba(0, 255, 255, 0.15), 0 0 30px rgba(0, 255, 255, 0.05);
+            --shadow-3d-relation: 0 8px 20px rgba(44, 158, 94, 0.15), 0 0 30px rgba(44, 158, 94, 0.05);
+            --shadow-3d-library: 0 8px 20px rgba(147, 51, 234, 0.15), 0 0 30px rgba(147, 51, 234, 0.05);
+            --shadow-3d-thinking: 0 8px 20px rgba(230, 57, 70, 0.15), 0 0 30px rgba(230, 57, 70, 0.05);
+            
+            /* 渐变和光效变量 */
+            --gradient-body: linear-gradient(135deg, rgba(212, 160, 23, 0.1) 0%, rgba(212, 160, 23, 0) 70%);
+            --gradient-focus: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 255, 255, 0) 70%);
+            --gradient-relation: linear-gradient(135deg, rgba(44, 158, 94, 0.1) 0%, rgba(44, 158, 94, 0) 70%);
+            --gradient-library: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(147, 51, 234, 0) 70%);
+            --gradient-thinking: linear-gradient(135deg, rgba(230, 57, 70, 0.1) 0%, rgba(230, 57, 70, 0) 70%);
+            
+            /* 具象化装饰变量 */
+            --icon-bg-body: radial-gradient(circle, rgba(212, 160, 23, 0.15) 0%, transparent 70%);
+            --icon-bg-focus: radial-gradient(circle, rgba(0, 255, 255, 0.15) 0%, transparent 70%);
+            --icon-bg-relation: radial-gradient(circle, rgba(44, 158, 94, 0.15) 0%, transparent 70%);
+            --icon-bg-library: radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+            --icon-bg-thinking: radial-gradient(circle, rgba(230, 57, 70, 0.15) 0%, transparent 70%);
+            
+            /* 立体渐变变量 */
+            --gradient-3d-body: linear-gradient(145deg, #121b2c, #0d1420);
+            --gradient-3d-focus: linear-gradient(145deg, #121b2c, #0d1420);
+            --gradient-3d-relation: linear-gradient(145deg, #121b2c, #0d1420);
+            --gradient-3d-library: linear-gradient(145deg, #121b2c, #0d1420);
+            --gradient-3d-thinking: linear-gradient(145deg, #121b2c, #0d1420);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            min-height: 100vh;
+            padding: 60px 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+            color: var(--text-main);
+            position: relative;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 1.5px;
+            background: linear-gradient(90deg, transparent, var(--gold-main), transparent);
+            box-shadow: 0 0 12px var(--gold-glow);
+        }
+        .page-title::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-main), transparent);
+            box-shadow: 0 0 8px var(--gold-glow);
+        }
+
+        /* 主容器 - 改为弹性布局，分为两行 */
+        .course-wrapper {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        /* 第一行：3列布局（身体、专注力、关系） */
+        .course-row-1 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        /* 第二行：调整为网格布局，保持和第一行相同的列间距和对齐方式 */
+        .course-row-2 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        /* 动作标准库和思维武器图书馆卡片分别占第一、二列 */
+        .course-row-2 .course-card {
+            width: 100%;
+            min-width: 300px;
+        }
+        .card-library {
+            grid-column: 1 / 2; /* 动作标准库固定在第一列 */
+        }
+        .card-thinking {
+            grid-column: 2 / 3; /* 思维武器图书馆固定在第二列 */
+        }
+
+        .course-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0;
+            min-height: 280px;
+            width: 100%;
+            max-width: none;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.03) 0%, transparent 20%),
+                var(--gradient-3d-body);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .course-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            border-radius: 0 12px 0 100px;
+            background: var(--gradient-body);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .course-card:hover::after {
+            opacity: 1;
+        }
+
+        .course-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            opacity: 0.8;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .card-icon-section {
+            width: 30%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(90deg, rgba(15, 23, 36, 0.95), rgba(15, 23, 36, 0.7));
+            padding: 25px;
+            position: relative;
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .icon-bg {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            z-index: 1;
+            opacity: 0.5;
+            transition: all 0.4s ease;
+            filter: blur(1px);
+        }
+        .card-body .icon-bg { background: var(--icon-bg-body); }
+        .card-focus .icon-bg { background: var(--icon-bg-focus); }
+        .card-relation .icon-bg { background: var(--icon-bg-relation); }
+        .card-library .icon-bg { background: var(--icon-bg-library); }
+        .card-thinking .icon-bg { background: var(--icon-bg-thinking); }
+        .course-card:hover .icon-bg {
+            transform: scale(1.15);
+            opacity: 0.7;
+        }
+        
+        .card-icon-section::before {
+            content: '';
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.5;
+            box-shadow: 0 0 8px currentColor;
+            z-index: 2;
+        }
+        
+        .art-icon-container {
+            position: relative;
+            width: 100%;
+            height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transform-style: preserve-3d;
+        }
+        
+        .main-icon {
+            font-size: 85px;
+            color: inherit;
+            text-shadow: 0 0 25px currentColor, 0 0 40px rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.3);
+            opacity: 0.95;
+            position: relative;
+            z-index: 3;
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transform: translateZ(10px);
+        }
+        
+        .art-decoration {
+            position: absolute;
+            color: inherit;
+            opacity: 0.35;
+            text-shadow: 0 0 15px currentColor, 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.5s ease;
+            z-index: 2;
+            transform: translateZ(5px);
+        }
+        
+        /* 身体铸造厂装饰 */
+        .body-deco-1 { font-size: 30px; top: -20px; right: -15px; }
+        .body-deco-2 { font-size: 25px; bottom: -15px; left: -10px; }
+        .body-deco-3 { font-size: 40px; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(3px); opacity: 0.2; }
+        .body-deco-4 { font-size: 22px; top: 15%; left: -15px; opacity: 0.3; }
+        .body-deco-5 { font-size: 20px; bottom: 15%; right: -10px; opacity: 0.3; }
+        .body-deco-6 { font-size: 28px; top: 70%; right: 10%; opacity: 0.25; }
+        
+        /* 专注力锻造舱装饰 */
+        .focus-deco-1 { font-size: 30px; top: -15px; left: -10px; }
+        .focus-deco-2 { font-size: 25px; bottom: -20px; right: -15px; }
+        .focus-deco-3 { font-size: 45px; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(3px); opacity: 0.2; }
+        .focus-deco-4 { font-size: 22px; top: 15%; right: -15px; opacity: 0.3; }
+        .focus-deco-5 { font-size: 20px; bottom: 15%; left: -10px; opacity: 0.3; }
+        .focus-deco-6 { font-size: 28px; top: 70%; left: 10%; opacity: 0.25; }
+        
+        /* 关系系统工程装饰 */
+        .relation-deco-1 { font-size: 28px; top: -15px; right: -10px; }
+        .relation-deco-2 { font-size: 25px; bottom: -15px; left: -10px; }
+        .relation-deco-3 { font-size: 40px; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(3px); opacity: 0.2; }
+        .relation-deco-4 { font-size: 22px; top: 15%; left: -15px; opacity: 0.3; }
+        .relation-deco-5 { font-size: 20px; bottom: 15%; right: -10px; opacity: 0.3; }
+        .relation-deco-6 { font-size: 28px; top: 70%; left: 10%; opacity: 0.25; }
+        
+        /* 动作标准库装饰（适配主题调整） */
+        .library-deco-1 { font-size: 30px; top: -15px; left: -10px; }
+        .library-deco-2 { font-size: 25px; bottom: -20px; right: -15px; }
+        .library-deco-3 { font-size: 45px; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(3px); opacity: 0.2; }
+        .library-deco-4 { font-size: 22px; top: 15%; right: -15px; opacity: 0.3; }
+        .library-deco-5 { font-size: 20px; bottom: 15%; left: -10px; opacity: 0.3; }
+        .library-deco-6 { font-size: 28px; top: 70%; left: 10%; opacity: 0.25; }
+        
+        /* 思维武器图书馆装饰 */
+        .thinking-deco-1 { font-size: 30px; top: -15px; right: -10px; }
+        .thinking-deco-2 { font-size: 25px; bottom: -15px; left: -10px; }
+        .thinking-deco-3 { font-size: 40px; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(3px); opacity: 0.2; }
+        .thinking-deco-4 { font-size: 22px; top: 15%; left: -15px; opacity: 0.3; }
+        .thinking-deco-5 { font-size: 20px; bottom: 15%; right: -10px; opacity: 0.3; }
+        .thinking-deco-6 { font-size: 28px; top: 70%; right: 10%; opacity: 0.25; }
+        
+        /* Hover动效 */
+        .course-card:hover .main-icon {
+            transform: scale(1.1) translateZ(15px);
+            text-shadow: 0 0 30px currentColor, 0 0 50px rgba(255,255,255,0.15), 0 6px 12px rgba(0,0,0,0.4);
+        }
+        .course-card:hover .art-decoration {
+            opacity: 0.55;
+            transform: scale(1.25) translateZ(8px);
+        }
+        .course-card:hover .body-deco-3,
+        .course-card:hover .focus-deco-3,
+        .course-card:hover .relation-deco-3,
+        .course-card:hover .library-deco-3,
+        .course-card:hover .thinking-deco-3 {
+            opacity: 0.35;
+            transform: translate(-50%, -50%) rotate(15deg) translateZ(5px);
+        }
+        .course-card:hover .body-deco-4,
+        .course-card:hover .focus-deco-4,
+        .course-card:hover .relation-deco-4,
+        .course-card:hover .library-deco-4,
+        .course-card:hover .thinking-deco-4 {
+            transform: translateZ(8px) rotate(-10deg);
+        }
+        .course-card:hover .body-deco-5,
+        .course-card:hover .focus-deco-5,
+        .course-card:hover .relation-deco-5,
+        .course-card:hover .library-deco-5,
+        .course-card:hover .thinking-deco-5 {
+            transform: translateZ(8px) rotate(10deg);
+        }
+        .course-card:hover .body-deco-6,
+        .course-card:hover .focus-deco-6,
+        .course-card:hover .relation-deco-6,
+        .course-card:hover .library-deco-6,
+        .course-card:hover .thinking-deco-6 {
+            transform: translateZ(8px) scale(1.3);
+        }
+        
+        .icon-tag {
+            position: absolute;
+            bottom: 15px;
+            z-index: 2;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: currentColor;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            transform: translateZ(2px);
+        }
+        .course-card:hover .icon-tag {
+            opacity: 0.8;
+            letter-spacing: 2.5px;
+            transform: translateZ(5px);
+        }
+
+        .card-content-section {
+            width: 70%;
+            padding: 28px 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(180deg, rgba(15,23,36,0.8), rgba(15,23,36,1));
+        }
+        
+        .card-content-section::before {
+            content: '';
+            position: absolute;
+            top: 30px;
+            left: 35px;
+            width: 40px;
+            height: 1px;
+            background: currentColor;
+            opacity: 0.3;
+        }
+
+        /* 身体铸造厂样式 */
+        .card-body::before { background: var(--color-body); }
+        .card-body .card-icon-section { border-right: 1px solid rgba(212, 160, 23, 0.15); }
+        .card-body .main-icon, .card-body .art-decoration { color: var(--color-body); }
+        .card-body { 
+            background-image: var(--gradient-3d-body);
+            box-shadow: var(--shadow-3d-body);
+        }
+        .card-body .start-btn { 
+            background: linear-gradient(135deg, var(--color-body), #e6b31e);
+            color: #000; 
+            box-shadow: 0 4px 10px rgba(212, 160, 23, 0.2), 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .card-body .start-btn:hover { 
+            background: linear-gradient(135deg, #e6b31e, #f7c52e); 
+            box-shadow: 0 0 20px rgba(212, 160, 23, 0.5), 0 4px 8px rgba(0,0,0,0.3); 
+            transform: translateY(-2px) translateZ(5px);
+        }
+        .card-body::after { background: var(--gradient-body); }
+        .card-body .card-content-section::before { background: var(--color-body); }
+
+        /* 专注力锻造舱样式 */
+        .card-focus::before { background: var(--color-focus); }
+        .card-focus .card-icon-section { border-right: 1px solid rgba(0, 255, 255, 0.15); }
+        .card-focus .main-icon, .card-focus .art-decoration { color: var(--color-focus); }
+        .card-focus { 
+            background-image: var(--gradient-3d-focus);
+            box-shadow: var(--shadow-3d-focus);
+        }
+        .card-focus .start-btn { 
+            background: linear-gradient(135deg, var(--color-focus), #33ffff); 
+            color: #000; 
+            box-shadow: 0 4px 10px rgba(0, 255, 255, 0.2), 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .card-focus .start-btn:hover { 
+            background: linear-gradient(135deg, #33ffff, #66ffff); 
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), 0 4px 8px rgba(0,0,0,0.3);
+            transform: translateY(-2px) translateZ(5px);
+        }
+        .card-focus::after { background: var(--gradient-focus); }
+        .card-focus .card-content-section::before { background: var(--color-focus); }
+
+        /* 关系系统工程样式 */
+        .card-relation::before { background: var(--color-relation); }
+        .card-relation .card-icon-section { border-right: 1px solid rgba(44, 158, 94, 0.15); }
+        .card-relation .main-icon, .card-relation .art-decoration { color: var(--color-relation); }
+        .card-relation { 
+            background-image: var(--gradient-3d-relation);
+            box-shadow: var(--shadow-3d-relation);
+        }
+        .card-relation .start-btn { 
+            background: linear-gradient(135deg, var(--color-relation), #38B06D); 
+            color: #000; 
+            box-shadow: 0 4px 10px rgba(44, 158, 94, 0.2), 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .card-relation .start-btn:hover { 
+            background: linear-gradient(135deg, #38B06D, #48c07d); 
+            box-shadow: 0 0 20px rgba(44, 158, 94, 0.5), 0 4px 8px rgba(0,0,0,0.3);
+            transform: translateY(-2px) translateZ(5px);
+        }
+        .card-relation::after { background: var(--gradient-relation); }
+        .card-relation .card-content-section::before { background: var(--color-relation); }
+
+        /* 动作标准库样式（原健身知识库） */
+        .card-library::before { background: var(--color-library); }
+        .card-library .card-icon-section { border-right: 1px solid rgba(147, 51, 234, 0.15); }
+        .card-library .main-icon, .card-library .art-decoration { color: var(--color-library); }
+        .card-library { 
+            background-image: var(--gradient-3d-library);
+            box-shadow: var(--shadow-3d-library);
+        }
+        .card-library .start-btn { 
+            background: linear-gradient(135deg, var(--color-library), #a855f7); 
+            color: #000; 
+            box-shadow: 0 4px 10px rgba(147, 51, 234, 0.2), 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .card-library .start-btn:hover { 
+            background: linear-gradient(135deg, #a855f7, #b76cf8); 
+            box-shadow: 0 0 20px rgba(147, 51, 234, 0.5), 0 4px 8px rgba(0,0,0,0.3);
+            transform: translateY(-2px) translateZ(5px);
+        }
+        .card-library::after { background: var(--gradient-library); }
+        .card-library .card-content-section::before { background: var(--color-library); }
+
+        /* 思维武器图书馆样式 */
+        .card-thinking::before { background: var(--color-thinking); }
+        .card-thinking .card-icon-section { border-right: 1px solid rgba(230, 57, 70, 0.15); }
+        .card-thinking .main-icon, .card-thinking .art-decoration { color: var(--color-thinking); }
+        .card-thinking { 
+            background-image: var(--gradient-3d-thinking);
+            box-shadow: var(--shadow-3d-thinking);
+        }
+        .card-thinking .start-btn { 
+            background: linear-gradient(135deg, var(--color-thinking), #f05454); 
+            color: #000; 
+            box-shadow: 0 4px 10px rgba(230, 57, 70, 0.2), 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .card-thinking .start-btn:hover { 
+            background: linear-gradient(135deg, #f05454, #f86c6c); 
+            box-shadow: 0 0 20px rgba(230, 57, 70, 0.5), 0 4px 8px rgba(0,0,0,0.3);
+            transform: translateY(-2px) translateZ(5px);
+        }
+        .card-thinking::after { background: var(--gradient-thinking); }
+        .card-thinking .card-content-section::before { background: var(--color-thinking); }
+
+        /* 卡片hover效果 */
+        .course-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            background-color: var(--bg-card-hover);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: var(--shadow-hover), 0 0 30px rgba(255,255,255,0.08);
+        }
+
+        /* 文字样式 */
+        .course-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--text-main), rgba(240, 244, 248, 0.8));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .course-title-eng {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.7;
+            margin-bottom: 18px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+
+        .course-desc {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-sub);
+            margin-bottom: 28px;
+            width: 100%;
+            text-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+        .course-desc strong {
+            color: currentColor;
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(255,255,255,0.1), 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* 按钮样式 */
+        .course-action {
+            text-align: center;
+        }
+
+        .start-btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transform: translateZ(3px);
+        }
+        
+        .start-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        .start-btn:hover::before {
+            left: 100%;
+        }
+
+        .brand-slogan {
+            text-align: center;
+            margin-top: 80px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            color: rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255,255,255,0.05), 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 1200px) {
+            .course-row-1, .course-row-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .course-row-1, .course-row-2 {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+            .course-row-2 .course-card {
+                grid-column: 1 / 2 !important;
+                width: 100%;
+                min-width: auto;
+            }
+            .course-card {
+                flex-direction: column;
+                min-height: auto;
+            }
+            .card-icon-section {
+                width: 100%;
+                height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 20px;
+            }
+            .icon-bg {
+                width: 180px;
+                height: 180px;
+            }
+            .main-icon {
+                font-size: 75px;
+            }
+            .art-decoration {
+                font-size: 22px !important;
+            }
+            .card-content-section {
+                width: 100%;
+                padding: 25px 28px;
+            }
+            .card-content-section::before {
+                top: 25px;
+                left: 28px;
+            }
+            .course-card::after {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <h1 class="page-title">建造者法则 | 核心体系</h1>
+
+    <!-- 外层容器，分为两行 -->
+    <div class="course-wrapper">
+        <!-- 第一行：身体铸造厂、专注力锻造舱、关系系统工程 -->
+        <div class="course-row-1">
+            <!-- 1. 身体铸造厂 -->
+            <div class="course-card card-body">
+                <div class="card-icon-section">
+                    <div class="icon-bg"></div>
+                    <div class="art-icon-container">
+                        <i class="fas fa-dumbbell main-icon"></i>
+                        <i class="fas fa-bullseye body-deco-1 art-decoration"></i>
+                        <i class="fas fa-muscle body-deco-2 art-decoration"></i>
+                        <i class="fas fa-circle body-deco-3 art-decoration"></i>
+                        <i class="fas fa-heartbeat body-deco-4 art-decoration"></i>
+                        <i class="fas fa-fire body-deco-5 art-decoration"></i>
+                        <i class="fas fa-shield-alt body-deco-6 art-decoration"></i>
+                    </div>
+                    <div class="icon-tag">STRENGTH</div>
+                </div>
+                <div class="card-content-section">
+                    <div class="text-content">
+                        <h3 class="course-title">身体铸造厂</h3>
+                        <div class="course-title-eng">The Body Foundry</div>
+                        <p class="course-desc">重启身体控制权。修复被焦虑干扰的控制系统，<strong>重新掌控</strong>自己的身体，建立与身体的深度连接。</p>
+                    </div>
+                    <div class="course-action">
+                        <!-- 修改：链接到指定的GitHub Pages地址，并添加安全属性 -->
+                        <a href="https://johnchen-spc.github.io/THE-BUILDER-S-CODE-90Days-Body-Movement-People/" 
+                           class="start-btn" 
+                           target="_blank" 
+                           rel="noopener noreferrer">开始锻造</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 专注力锻造舱 - 修复按钮链接 -->
+            <div class="course-card card-focus">
+                <div class="card-icon-section">
+                    <div class="icon-bg"></div>
+                    <div class="art-icon-container">
+                        <i class="fas fa-brain main-icon"></i>
+                        <i class="fas fa-lightbulb focus-deco-1 art-decoration"></i>
+                        <i class="fas fa-crosshairs focus-deco-2 art-decoration"></i>
+                        <i class="fas fa-star focus-deco-3 art-decoration"></i>
+                        <i class="fas fa-clock focus-deco-4 art-decoration"></i>
+                        <i class="fas fa-search focus-deco-5 art-decoration"></i>
+                        <i class="fas fa-atom focus-deco-6 art-decoration"></i>
+                    </div>
+                    <div class="icon-tag">FOCUS</div>
+                </div>
+                <div class="card-content-section">
+                    <div class="text-content">
+                        <h3 class="course-title">专注力锻造舱</h3>
+                        <div class="course-title-eng">Focus Forge</div>
+                        <p class="course-desc">把注意力变成可用能源，切断过度思考的内耗，<strong>建立深度专注</strong>的工作与生活节律。</p>
+                    </div>
+                    <div class="course-action">
+                        <!-- 关键修复：添加target和rel属性，确保链接能正常跳转 -->
+                        <a href="https://johnchen-spc.github.io/THE-BUILDER-S-CODE-90Days-Movement-People/" 
+                           class="start-btn" 
+                           target="_blank" 
+                           rel="noopener noreferrer">进入舱体</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 关系系统工程 -->
+            <div class="course-card card-relation">
+                <div class="card-icon-section">
+                    <div class="icon-bg"></div>
+                    <div class="art-icon-container">
+                        <i class="fas fa-sitemap main-icon"></i>
+                        <i class="fas fa-link relation-deco-1 art-decoration"></i>
+                        <i class="fas fa-users relation-deco-2 art-decoration"></i>
+                        <i class="fas fa-network-wired relation-deco-3 art-decoration"></i>
+                        <i class="fas fa-handshake relation-deco-4 art-decoration"></i>
+                        <i class="fas fa-users-cog relation-deco-5 art-decoration"></i>
+                        <i class="fas fa-heart relation-deco-6 art-decoration"></i>
+                    </div>
+                    <div class="icon-tag">CONNECT</div>
+                </div>
+                <div class="card-content-section">
+                    <div class="text-content">
+                        <h3 class="course-title">关系系统工程</h3>
+                        <div class="course-title-eng">Relationship Systems</div>
+                        <p class="course-desc">让关系从消耗变成支持，用工程思维重建关系结构，<strong>稳固现实根基</strong>。</p>
+                    </div>
+                    <div class="course-action">
+                        <a href="#" class="start-btn">构建系统</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第二行：动作标准库 + 思维武器图书馆 -->
+        <div class="course-row-2">
+            <!-- 4. 动作标准库 -->
+            <div class="course-card card-library">
+                <div class="card-icon-section">
+                    <div class="icon-bg"></div>
+                    <div class="art-icon-container">
+                        <i class="fas fa-ruler-combined main-icon"></i> <!-- 标尺图标，贴合"标准"主题 -->
+                        <i class="fas fa-check-double library-deco-1 art-decoration"></i> <!-- 双对勾：规范 -->
+                        <i class="fas fa-person-running library-deco-2 art-decoration"></i> <!-- 跑步：动作 -->
+                        <i class="fas fa-circle-check library-deco-3 art-decoration"></i> <!-- 圆形对勾：标准 -->
+                        <i class="fas fa-arrows-to-eye library-deco-4 art-decoration"></i> <!-- 精准定位 -->
+                        <i class="fas fa-layer-group library-deco-5 art-decoration"></i> <!-- 层级：体系 -->
+                        <i class="fas fa-clipboard-check library-deco-6 art-decoration"></i> <!-- 检查清单：规范 -->
+                    </div>
+                    <div class="icon-tag">STANDARD</div> <!-- 标准主题标签 -->
+                </div>
+                <div class="card-content-section">
+                    <div class="text-content">
+                        <h3 class="course-title">动作标准库</h3>
+                        <div class="course-title-eng">Motion Forge / Movement Library</div>
+                        <p class="course-desc">建立动作的黄金标准，校准每一个发力细节，<strong>让每一次运动都精准有效</strong>，规避代偿与损伤风险。</p>
+                    </div>
+                    <div class="course-action">
+                        <a href="#" class="start-btn">校准动作</a> <!-- 按钮文案贴合主题 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. 思维武器图书馆（新增） -->
+            <div class="course-card card-thinking">
+                <div class="card-icon-section">
+                    <div class="icon-bg"></div>
+                    <div class="art-icon-container">
+                        <i class="fas fa-book-atlas main-icon"></i> <!-- 地图册/知识库图标，贴合"图书馆"主题 -->
+                        <i class="fas fa-brain thinking-deco-1 art-decoration"></i> <!-- 大脑：思维 -->
+                        <i class="fas fa-sword thinking-deco-2 art-decoration"></i> <!-- 剑：武器 -->
+                        <i class="fas fa-book-open thinking-deco-3 art-decoration"></i> <!-- 打开的书：图书馆 -->
+                        <i class="fas fa-puzzle-piece thinking-deco-4 art-decoration"></i> <!-- 拼图：策略 -->
+                        <i class="fas fa-lightbulb thinking-deco-5 art-decoration"></i> <!-- 灯泡：灵感 -->
+                        <i class="fas fa-chess-knight thinking-deco-6 art-decoration"></i> <!-- 骑士：策略/武器 -->
+                    </div>
+                    <div class="icon-tag">STRATEGY</div> <!-- 策略主题标签 -->
+                </div>
+                <div class="card-content-section">
+                    <div class="text-content">
+                        <h3 class="course-title">思维武器图书馆</h3>
+                        <div class="course-title-eng">Thinking Weapons Library</div>
+                        <p class="course-desc">装备顶级的思维工具，用结构化的认知框架，<strong>破解复杂问题</strong>，做出高质量决策。</p>
+                    </div>
+                    <div class="course-action">
+                        <!-- 修改：链接到指定的飞书文档地址，并添加安全属性 -->
+                        <a href="https://fcndfcb39zum.feishu.cn/wiki/space/7599270434881670097?ccm_open_type=lark_wiki_spaceLink&open_tab_from=wiki_home" 
+                           class="start-btn" 
+                           target="_blank" 
+                           rel="noopener noreferrer">解锁武器</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="brand-slogan">MOVEMENT PEOPLE</h2>
+
+</body>
+</html>
